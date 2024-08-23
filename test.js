@@ -64,7 +64,7 @@ function testDeepArrEq() {
 testDeepArrEq();
 
 function test_run() {
-  const chip = {
+  const xor = {
     output: [3],
     inputs: 2,
     gates: [
@@ -94,10 +94,10 @@ function test_run() {
   };
 
   console.time("run");
-  console.assert(cs.run(chip, [0, 0])[0] === 0, "0 xor 0 !== 0");
-  console.assert(cs.run(chip, [1, 0])[0] === 1, "1 xor 0 !== 1");
-  console.assert(cs.run(chip, [0, 1])[0] === 1, "0 xor 1 !== 1");
-  console.assert(cs.run(chip, [1, 1])[0] === 0, "1 xor 1 !== 0");
+  console.assert(cs.run(xor, [0, 0])[0] === 0, "0 xor 0 !== 0");
+  console.assert(cs.run(xor, [1, 0])[0] === 1, "1 xor 0 !== 1");
+  console.assert(cs.run(xor, [0, 1])[0] === 1, "0 xor 1 !== 1");
+  console.assert(cs.run(xor, [1, 1])[0] === 0, "1 xor 1 !== 0");
 
   console.assert(deepArrEq(cs.run(right_shift, [1, 0, 0, 1, 1, 0, 0, 1, 1]), [1, 0, 0, 1, 1, 0, 0, 1]), "right shift faulty");
   console.timeEnd("run");

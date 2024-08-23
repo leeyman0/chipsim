@@ -1,6 +1,6 @@
 /** gets the dimensions of the truth table, by bits of input and and bits of output.
  * 
- * Truth tables must be canonical and well-formed, not sparse in the first row and column.
+ * Truth tables must be canonical and well-formed, not sparse in the first row.
  * @param {Array} tt the Truth Table to analyze.
  * @returns {[number, number]} A tuple of the number of inputs and the number of outputs.
  */
@@ -28,6 +28,7 @@ function setTT(tt, ip, val) {
   frame[input[input.length - 1]] = val;
 }
 /** Gets the value at the position represented by ips.
+ * 
  * @param {Array} tt the array that
  * @param {Array<number>} ip the indexes of each successive array. 
  * @returns {Array | any} the value in that space. 

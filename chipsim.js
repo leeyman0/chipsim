@@ -1,4 +1,4 @@
-import { getTT, setTT, getDimensions } from './ttUtils';
+import ttUtils from './ttUtils.js';
 
 /** runs a chip on inputs to produce outputs.
  * @param {Object} c the chip object
@@ -62,7 +62,7 @@ function run(c, inputs) {
  */
 function fromTruthTable(tt) {
   // inputs is the number of inputs, outputs is the number of outputs.
-  let [inputs, outputs] = getDimensions(tt);
+  let [inputs, outputs] = ttUtils.getDimensions(tt);
 
   let gate = [];
   let output = new Array(outputs);
@@ -113,7 +113,7 @@ function toTruthTable(c) {
 
   // Run the chip for each input
   allInputs.forEach((v) => {
-    setTT(output, v, run(c, v));
+    ttUtils.setTT(output, v, run(c, v));
   });
   // console.log(output);
   return output;
