@@ -1,3 +1,5 @@
+import { getTT, setTT, getDimensions } from './ttUtils';
+
 /** runs a chip on inputs to produce outputs.
  * @param {Object} c the chip object
  * @param {number[]} inputs an array of 0 or 1
@@ -25,6 +27,7 @@ function run(c, inputs) {
         // array of gates.
         let { gate, input } = c.gates[i];
 
+        // Where each of the functions happen
         function and(a, b) {
           return a * b;
         }
@@ -58,18 +61,31 @@ function run(c, inputs) {
  * @return {Object} a chip model.
  */
 function fromTruthTable(tt) {
-  function getDimensions(tt) {
-    let ip = 0;
-    let frame = tt;
-    while (Array.isArray(frame[0])) {
-      ++ip;
-      frame = frame[0];
-    }
-    return [ip, frame.length];
-  }
+  // inputs is the number of inputs, outputs is the number of outputs.
+  let [inputs, outputs] = getDimensions(tt);
 
-  // TODO: Implement
+  let gate = [];
+  let output = new Array(outputs);
+
+  let chip = {
+    inputs,
+    output,
+    gate,
+  }
+  return chip;
 }
+
+/** optimizes gate layout of a chip, by eliminating duplicates and equivalent structures.
+ * 
+ * @param {object} chip the chip that gets optimized. It will be modified.
+ * @returns {object} the optimized chip. Will be the same thing as the parameter.
+ */
+function bake(chip) {
+
+
+  return chip;
+}
+
 
 /** creates a truth table from a chip model. It does this by running the chip through all the
  * possible inputs.
@@ -94,18 +110,10 @@ function toTruthTable(c) {
     }
   }
   // console.log(output);
-  // Takes care of setting the value from a list of successive indexes.
-  function recSet(input, s) {
-    let frame = output;
-    for (let m = 0; m < input.length - 1; m++) {
-      frame = frame[input[m]];
-    }
-    frame[input[input.length - 1]] = s;
-  }
 
   // Run the chip for each input
   allInputs.forEach((v) => {
-    recSet(v, run(c, v));
+    setTT(output, v, run(c, v));
   });
   // console.log(output);
   return output;
@@ -113,6 +121,7 @@ function toTruthTable(c) {
 
 export default Object.freeze({
   run,
+  bake,
   fromTruthTable,
   toTruthTable,
 });

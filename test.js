@@ -137,5 +137,13 @@ function test_toTruthTable() {
 }
 test_toTruthTable();
 
-function test_fromTruthTable() {}
+function test_fromTruthTable() {
+  const tt = [
+    [[0], [1]],
+    [[1], [0]],
+  ];
+  console.time("fromTruthTable");
+  console.assert(deepArrEq(tt, cs.toTruthTable(cs.fromTruthTable(tt))), "toTruthTable does not run correctly on XOR truth table.")
+  console.timeEnd("fromTruthTable");
+}
 test_fromTruthTable();
