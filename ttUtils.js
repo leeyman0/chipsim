@@ -23,9 +23,9 @@ function getDimensions(tt) {
 function setTT(tt, ip, val) {
   let frame = tt;
   for (let m = 0; m < ip.length - 1; m++) {
-    frame = frame[input[m]];
+    frame = frame[ip[m]];
   }
-  frame[input[input.length - 1]] = val;
+  frame[ip[ip.length - 1]] = val;
 }
 /** Gets the value at the position represented by ips.
  * 
