@@ -29,13 +29,13 @@ function run(c, inputs) {
 
         // Where each of the functions happen
         function and(a, b) {
-          return a * b;
+          return a & b;
         }
         function or(a, b) {
-          return (a + b) % 2;
+          return a | b;
         }
         function not(a) {
-          return a === 0 ? 1 : 0;
+          return ~a & 1; // We are working with only one bit, but bitwise not works on the others.
         }
         if (gate === "AND") {
           memo[i] = and(access(input[0]), access(input[1]));
@@ -50,6 +50,7 @@ function run(c, inputs) {
           // console.log(`${gate}\t${input} = ${memo[i]}`);
           return memo[i];
         }
+        return memo[i];
       }
     }
     return 0;
@@ -90,13 +91,13 @@ function buildDemultiplexer(bits) {
         input: [current_bit], 
       });
       // "This gate is the first output", the one at index n. It happens when the current bit is 0
-      let n = gates.length;
+      const n = gates.length;
       gates.push({
         gate: "AND",
         input: [gi,  n - 1]         
       });
       // "This gate is the next output", the one at index m. It happens when the current bit is 1
-      let m = gates.length;
+      const m = gates.length;
       gates.push({
         gate: "AND",
         input: [gi, current_bit]
@@ -120,15 +121,21 @@ function fromTruthTable(tt) {
   // inputs is the number of inputs, outputs is the number of outputs.
   let [inputs, outputs] = ttUtils.getDimensions(tt);
 
-  let gate = [];
+  let gates = [];
   let output = new Array(outputs);
 
-  let chip = {
+  // getting access to each of the inputs via a demultiplexer
+  let demux = buildDemultiplexer(inputs);
+
+  demux.outputs.forEach((gate_index, input_index) => {
+
+  });
+
+  return {
     inputs,
     output,
-    gate,
-  }
-  return chip;
+    gates,
+  };
 }
 
 /** optimizes gate layout of a chip, by eliminating duplicates and equivalent structures.

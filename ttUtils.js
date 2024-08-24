@@ -30,7 +30,7 @@ function setTT(tt, ip, val) {
 /** Gets the value at the position represented by ips.
  * 
  * @param {Array} tt the array that
- * @param {Array<number>} ip the indexes of each successive array. 
+ * @param {number[]} ip the indexes of each successive array. 
  * @returns {Array | any} the value in that space. 
  */
 function getTT(tt, ip) {
@@ -41,8 +41,19 @@ function getTT(tt, ip) {
   return frame;
 }
 
+/** turns a number into its constituent bits.
+ * 
+ * @param {number} n the number to transform into bits.
+ * @param {number} width the width to pad with zero
+ * @returns {number[]} an array width-wide of either 0 or 1 that is the binary
+ */
+function toBits(n, width) {
+  return  [...(n - 1).toString(2).padStart(width, "0")].map((b) => parseInt(b, 2));
+}
+
 export default Object.freeze({
     getDimensions,
     setTT,
-    getTT
+    getTT,
+    toBits,
 });
