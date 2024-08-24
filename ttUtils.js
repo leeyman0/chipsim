@@ -36,7 +36,7 @@ function setTT(tt, ip, val) {
 function getTT(tt, ip) {
   let frame = tt;
   for (let i = 0; i < ip.length; i++) {
-    frame = frame[i];
+    frame = frame[ip[i]];
   }
   return frame;
 }

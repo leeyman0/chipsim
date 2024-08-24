@@ -56,6 +56,62 @@ function run(c, inputs) {
   });
 }
 
+/** connects two chips.
+ * 
+ * @param {object} c1 the first chip
+ * @param {object} c2 the second chip
+ * @param {Map<number, number>} oi the way to connect both chips.
+ * @returns {object} the resultant chip.
+ */
+function connectChips(c1, c2, oi) {
+
+}
+
+/** builds a demultiplexer chip from a number of bits.
+ * 
+ * @param {number} bits 
+ * @returns {object} a chip object containing the demultiplexer
+ */
+function buildDemultiplexer(bits) {
+  // Ohh, so _that's_ why it takes so long!
+  // will store the gates and outputs.
+  let gates = [{
+    gate: 'NOT',
+    input: [-1],
+  }];
+  let output = [0, -1];
+
+  // Using the iterative approach, generating the demux to the number of bits that we need.
+  for (let i = 1; i < bits; i++) {
+    const current_bit = ~i;
+    output = output.flatMap((gi) => {
+      gates.push({
+        gate: "NOT",
+        input: [current_bit], 
+      });
+      // "This gate is the first output", the one at index n. It happens when the current bit is 0
+      let n = gates.length;
+      gates.push({
+        gate: "AND",
+        input: [gi,  n - 1]         
+      });
+      // "This gate is the next output", the one at index m. It happens when the current bit is 1
+      let m = gates.length;
+      gates.push({
+        gate: "AND",
+        input: [gi, current_bit]
+      })
+      return [n, m];
+    })
+  }
+
+  return {
+    inputs: bits,
+    gates,
+    output    
+  };
+}
+
 /** creates a chip model from a truth table.
  * @param {Array} tt
  * @return {Object} a chip model.
@@ -122,6 +178,7 @@ function toTruthTable(c) {
 export default Object.freeze({
   run,
   bake,
+  buildDemultiplexer,
   fromTruthTable,
   toTruthTable,
 });

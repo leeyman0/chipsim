@@ -73,6 +73,23 @@ function test_toTruthTable() {
   console.timeEnd("toTruthTable");
 }
 
+function test_buildDemultiplexer() {
+  console.time("buildDemultiplexer");
+  const demux4 = cs.buildDemultiplexer(4);
+  console.timeEnd("buildDemultiplexer");
+  
+  console.time("demux_perf");
+  for (let i = 0; i < 2 ** 4; i++) {
+    // The amount that will be taken up by the preparation will be constant.
+    const ip = [...i.toString(2).padStart(4, '0')].map(n => parseInt(n, 2));
+    const expectedOutput = [...new Array(i).fill(0), 1, ...new Array(15 - i).fill(0)];
+    // As the model change, so does the performance of this.
+    const actualOutput = cs.run(demux4, ip);
+    console.assert(testUtils.deepArrEq(actualOutput, expectedOutput), `demux failed on ${i}`, expectedOutput, actualOutput);
+  }
+  console.timeEnd("demux_perf")
+}
+
 function test_fromTruthTable() {
   const tt = [
     [[0], [1]],
@@ -86,6 +103,7 @@ function test_fromTruthTable() {
 function runSuite() {
   test_run();
   test_toTruthTable();
+  test_buildDemultiplexer();
   test_fromTruthTable();
 }
 
