@@ -45,10 +45,10 @@ function getTT(tt, ip) {
  * 
  * @param {number} n the number to transform into bits.
  * @param {number} width the width to pad with zero
- * @returns {number[]} an array width-wide of either 0 or 1 that is the binary
+ * @returns {number[]} an array width-wide of either 0 or 1 that is the little-endian binary representation of it.
  */
 function toBits(n, width) {
-  return  [...(n - 1).toString(2).padStart(width, "0")].map((b) => parseInt(b, 2));
+  return  [...(n).toString(2).padStart(width, "0")].map((b) => parseInt(b, 2));
 }
 
 export default Object.freeze({

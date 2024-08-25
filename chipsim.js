@@ -109,7 +109,7 @@ function buildDemultiplexer(bits) {
   return {
     inputs: bits,
     gates,
-    output    
+    output,     
   };
 }
 
@@ -121,14 +121,59 @@ function fromTruthTable(tt) {
   // inputs is the number of inputs, outputs is the number of outputs.
   let [inputs, outputs] = ttUtils.getDimensions(tt);
 
-  let gates = [];
+  // The output array gets initialized within the demux.outputs loop.
   let output = new Array(outputs);
 
   // getting access to each of the inputs via a demultiplexer
   let demux = buildDemultiplexer(inputs);
 
-  demux.outputs.forEach((gate_index, input_index) => {
+  // use the gates over from demuxer, so that we have the base logic and don't have to copy anything.
+  let gates = demux.gates;
 
+  // This is the straightforward way. Build a demultiplexer, then take each of the inputs and
+  // translate them into the expectedOutput.
+  demux.output.forEach((gate_index, input_index) => {
+    const current_case = ttUtils.toBits(input_index, inputs);
+    // console.log(current_case);
+    const expectedOutput = ttUtils.getTT(tt, current_case);
+
+    if (input_index > 0) {
+      // Push or gates to get the output working, and update the outputs.
+      expectedOutput.forEach((g, i) => {
+        if (g !== 0) { // If the expected output is false, it doesn't get updated at all.
+          let og = gates.length;
+          gates.push({
+            gate: "OR",
+            input: [output[i], gate_index]
+          });
+          // The output is updated to reflect the current input.
+          output[i] = og;
+        }
+      })
+    } else {
+      // Initalize the array of output indexes.
+      expectedOutput.forEach((g, i) => {
+        if (g === 0) {
+          // Create a NOT gate,
+          let ng = gates.length;
+          gates.push({
+            gate: "NOT",
+            input: [gate_index]
+          });
+          // create an AND gate,
+          let ag = gates.length;
+          gates.push({
+            gate: "AND",
+            input: [gate_index, ng],
+          });
+          // to make sure false is provided to output.
+          output[i] = ag;
+        } else {
+          // We don't have to change anything.
+          output[i] = gate_index;
+        }
+      })
+    }
   });
 
   return {

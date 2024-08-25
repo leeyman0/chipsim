@@ -96,7 +96,9 @@ function test_fromTruthTable() {
     [[1], [0]],
   ];
   console.time("fromTruthTable");
-  console.assert(testUtils.deepArrEq(tt, cs.toTruthTable(cs.fromTruthTable(tt))), "toTruthTable does not run correctly on XOR truth table.");
+  const compiledOutput = cs.fromTruthTable(tt);
+  // console.log(compiledOutput);
+  console.assert(testUtils.deepArrEq(tt, cs.toTruthTable(compiledOutput)), "toTruthTable does not run correctly on XOR truth table.");
   console.timeEnd("fromTruthTable");
 }
 
