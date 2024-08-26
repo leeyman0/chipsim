@@ -77,17 +77,17 @@ function test_buildDemultiplexer() {
   console.time("buildDemultiplexer");
   const demux4 = cs.buildDemultiplexer(4);
   console.timeEnd("buildDemultiplexer");
-  
+
   console.time("demux_perf");
   for (let i = 0; i < 2 ** 4; i++) {
     // The amount that will be taken up by the preparation will be constant.
-    const ip = [...i.toString(2).padStart(4, '0')].map(n => parseInt(n, 2));
+    const ip = [...i.toString(2).padStart(4, "0")].map((n) => parseInt(n, 2));
     const expectedOutput = [...new Array(i).fill(0), 1, ...new Array(15 - i).fill(0)];
     // As the model change, so does the performance of this.
     const actualOutput = cs.run(demux4, ip);
     console.assert(testUtils.deepArrEq(actualOutput, expectedOutput), `demux failed on ${i}`, expectedOutput, actualOutput);
   }
-  console.timeEnd("demux_perf")
+  console.timeEnd("demux_perf");
 }
 
 function test_fromTruthTable() {
@@ -100,6 +100,80 @@ function test_fromTruthTable() {
   // console.log(compiledOutput);
   console.assert(testUtils.deepArrEq(tt, cs.toTruthTable(compiledOutput)), "toTruthTable does not run correctly on XOR truth table.");
   console.timeEnd("fromTruthTable");
+  const tt_2 = [
+    [
+      [
+        [
+          [0, 1],
+          [1, 1],
+        ],
+        [
+          [1, 0],
+          [0, 0],
+        ],
+      ],
+      [
+        [
+          [1, 1],
+          [1, 0],
+        ],
+        [
+          [0, 0],
+          [0, 1],
+        ],
+      ],
+    ],
+    [
+      [
+        [
+          [1, 0],
+          [0, 0],
+        ],
+        [
+          [0, 1],
+          [1, 1],
+        ],
+      ],
+      [
+        [
+          [0, 0],
+          [0, 1],
+        ],
+        [
+          [1, 1],
+          [1, 0],
+        ],
+      ],
+    ],
+  ];
+  console.time("fromTruthTable_2");
+  console.assert(testUtils.deepArrEq(tt_2, cs.toTruthTable(cs.fromTruthTable(tt_2))), "fromTruthTable Failed on the arbitrary truth table");
+  console.timeEnd("fromTruthTable_2");
+}
+
+function test_bake() {
+  const doubleNotGate = {
+    output: [1],
+    inputs: 1,
+    gates: [
+      {
+        gate: "NOT",
+        input: [-1],
+      },
+      {
+        gate: "NOT",
+        input: [0],
+      },
+    ],
+  };
+  console.time("bake");
+  const output = cs.bake(doubleNotGate);
+  console.assert(output.gates.length === 0, "Double NOT gates get removed.");
+  console.assert(
+    testUtils.deepArrEq(cs.toTruthTable(doubleNotGate), cs.toTruthTable(output)),
+    "The optimized output does not function the same as it did unoptimized",
+  );
+  console.timeEnd("bake");
 }
 
 function runSuite() {
@@ -107,6 +181,7 @@ function runSuite() {
   test_toTruthTable();
   test_buildDemultiplexer();
   test_fromTruthTable();
+  test_bake();
 }
 
 export default Object.freeze({

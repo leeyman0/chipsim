@@ -108,7 +108,7 @@ function test_getDimensions() {
     ],
   ];
   console.time("getDimensions");
-  console.assert(testUtils.deepArrEq(ttUtils.getDimensions(tt), [3, 4]), "")
+  console.assert(testUtils.deepArrEq(ttUtils.getDimensions(tt), [3, 4]), "");
   console.timeEnd("getDimensions");
 }
 

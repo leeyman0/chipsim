@@ -1,4 +1,4 @@
-import ttUtils from './ttUtils.js';
+import ttUtils from "./ttUtils.js";
 
 /** runs a chip on inputs to produce outputs.
  * @param {Object} c the chip object
@@ -58,28 +58,28 @@ function run(c, inputs) {
 }
 
 /** connects two chips.
- * 
+ *
  * @param {object} c1 the first chip
  * @param {object} c2 the second chip
  * @param {Map<number, number>} oi the way to connect both chips.
  * @returns {object} the resultant chip.
  */
-function connectChips(c1, c2, oi) {
-
-}
+function connectChips(c1, c2, oi) {}
 
 /** builds a demultiplexer chip from a number of bits.
- * 
- * @param {number} bits 
+ *
+ * @param {number} bits
  * @returns {object} a chip object containing the demultiplexer
  */
 function buildDemultiplexer(bits) {
   // Ohh, so _that's_ why it takes so long!
   // will store the gates and outputs.
-  let gates = [{
-    gate: 'NOT',
-    input: [-1],
-  }];
+  let gates = [
+    {
+      gate: "NOT",
+      input: [-1],
+    },
+  ];
   let output = [0, -1];
 
   // Using the iterative approach, generating the demux to the number of bits that we need.
@@ -88,28 +88,28 @@ function buildDemultiplexer(bits) {
     output = output.flatMap((gi) => {
       gates.push({
         gate: "NOT",
-        input: [current_bit], 
+        input: [current_bit],
       });
       // "This gate is the first output", the one at index n. It happens when the current bit is 0
       const n = gates.length;
       gates.push({
         gate: "AND",
-        input: [gi,  n - 1]         
+        input: [gi, n - 1],
       });
       // "This gate is the next output", the one at index m. It happens when the current bit is 1
       const m = gates.length;
       gates.push({
         gate: "AND",
-        input: [gi, current_bit]
-      })
+        input: [gi, current_bit],
+      });
       return [n, m];
-    })
+    });
   }
 
   return {
     inputs: bits,
     gates,
-    output,     
+    output,
   };
 }
 
@@ -140,16 +140,17 @@ function fromTruthTable(tt) {
     if (input_index > 0) {
       // Push or gates to get the output working, and update the outputs.
       expectedOutput.forEach((g, i) => {
-        if (g !== 0) { // If the expected output is false, it doesn't get updated at all.
+        if (g !== 0) {
+          // If the expected output is false, it doesn't get updated at all.
           let og = gates.length;
           gates.push({
             gate: "OR",
-            input: [output[i], gate_index]
+            input: [output[i], gate_index],
           });
           // The output is updated to reflect the current input.
           output[i] = og;
         }
-      })
+      });
     } else {
       // Initalize the array of output indexes.
       expectedOutput.forEach((g, i) => {
@@ -158,7 +159,7 @@ function fromTruthTable(tt) {
           let ng = gates.length;
           gates.push({
             gate: "NOT",
-            input: [gate_index]
+            input: [gate_index],
           });
           // create an AND gate,
           let ag = gates.length;
@@ -172,7 +173,7 @@ function fromTruthTable(tt) {
           // We don't have to change anything.
           output[i] = gate_index;
         }
-      })
+      });
     }
   });
 
@@ -183,17 +184,40 @@ function fromTruthTable(tt) {
   };
 }
 
+function cloneChip({ inputs, gates, output }) {
+  return {
+    inputs,
+    output: [...output],
+    gates: gates.map((o) => {
+      return { ...o };
+    }),
+  };
+}
+
 /** optimizes gate layout of a chip, by eliminating duplicates and equivalent structures.
- * 
- * @param {object} chip the chip that gets optimized. It will be modified.
+ *
+ * @param {object} chip the chip that gets optimized. It will not be modified.
  * @returns {object} the optimized chip. Will be the same thing as the parameter.
  */
 function bake(chip) {
+  const newChip = cloneChip(chip);
 
+  const traversalMemo = new Array(chip.gates.length).fill(false);
+  // first, eliminate gates that aren't traversed from output.
+  for (const out of newChip.output) {
+    let stack = [out];
+    while (stack.length > 0) {
+      let cIndex = stack.pop();
+      traversalMemo[cIndex] = true;
+      stack.push(...newChip.gates[cindex].input);
+    }
+  }
 
-  return chip;
+  // get the indices to eliminate
+  const eliminate = traversalMemo.flatMap((p, i) => (p ? [] : [i]));
+
+  return newChip;
 }
-
 
 /** creates a truth table from a chip model. It does this by running the chip through all the
  * possible inputs.

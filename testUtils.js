@@ -43,5 +43,5 @@ function deepArrEq(a1, a2) {
 }
 
 export default Object.freeze({
-    deepArrEq
-})
+  deepArrEq,
+});
