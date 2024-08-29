@@ -184,6 +184,14 @@ function fromTruthTable(tt) {
   };
 }
 
+/** returns a chip object with no reference to the original.
+ * The new chip can be modified with no modification to the original.
+ *
+ * @param {object} param0 the chip to clone
+ * @param {number} param0.inputs The number of inputs that need to be supplied to the chip each time it gets run.
+ * @param {object[]} param0.gates The gates that are contained within the chip.
+ * @param {number[]} param0.output the indexes of the output gates.
+ */
 function cloneChip({ inputs, gates, output }) {
   return {
     inputs,
@@ -208,14 +216,45 @@ function bake(chip) {
     let stack = [out];
     while (stack.length > 0) {
       let cIndex = stack.pop();
+      console.log("traversing", cIndex);
       traversalMemo[cIndex] = true;
-      stack.push(...newChip.gates[cindex].input);
+      // This line is a work of art. It loads onto the stack all untraveled proper indices.
+      stack.push(...newChip.gates[cIndex].input.filter((i) => i >= 0 && !traversalMemo[i]));
     }
   }
 
   // get the indices to eliminate
-  const eliminate = traversalMemo.flatMap((p, i) => (p ? [] : [i]));
+  let eliminate = traversalMemo.flatMap((p, i) => (p ? [] : [i]));
+  console.log("eliminating", eliminate);
+  // make a translation table from the indices to eliminate
+  // to translate old indices to new ones.
+  let translationTable = new Map();
 
+  let downset = 0;
+  for (let i = 0; i < newChip.gates.length; i++) {
+    if (i === eliminate[0]) {
+      ++downset;
+      eliminate.shift();
+    } else {
+      translationTable.set(i, i - downset);
+    }
+  }
+
+  // change every single reference
+  newChip.gates = newChip.gates.flatMap((g, i) => {
+    if (translationTable.get(i) === undefined) return [];
+    else
+      return [
+        {
+          gate: g.gate,
+          input: g.input.map((ip) => (ip < 0 ? ip : translationTable.get(ip))),
+        },
+      ];
+  });
+
+  // change all the references in the output too.
+  newChip.output = newChip.output.map((ip) => (ip < 0 ? ip : translationTable.get(ip)));
+  // Find tautologous gates
   return newChip;
 }
 
@@ -257,4 +296,5 @@ export default Object.freeze({
   buildDemultiplexer,
   fromTruthTable,
   toTruthTable,
+  cloneChip,
 });

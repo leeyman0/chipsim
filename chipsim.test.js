@@ -166,7 +166,32 @@ function test_bake() {
       },
     ],
   };
+  const unusedGates = {
+    output: [2],
+    inputs: 2,
+    gates: [
+      {
+        gate: "AND",
+        input: [-1, -2],
+      },
+      {
+        gate: "OR",
+        input: [-1, -2],
+      },
+      {
+        gate: "NOT",
+        input: [1],
+      },
+    ],
+  };
   console.time("bake");
+  const gatesAllUsed = cs.bake(unusedGates);
+  console.assert(gatesAllUsed.gates.length === 2, "The unused AND gate is not eliminated.");
+  console.assert(
+    testUtils.deepArrEq(cs.toTruthTable(unusedGates), cs.toTruthTable(gatesAllUsed)),
+    "The optimized output does not function the same as it did unoptimized.",
+  );
+
   const output = cs.bake(doubleNotGate);
   console.assert(output.gates.length === 0, "Double NOT gates get removed.");
   console.assert(
