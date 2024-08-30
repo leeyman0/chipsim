@@ -151,62 +151,11 @@ function test_fromTruthTable() {
   console.timeEnd("fromTruthTable_2");
 }
 
-function test_bake() {
-  const doubleNotGate = {
-    output: [1],
-    inputs: 1,
-    gates: [
-      {
-        gate: "NOT",
-        input: [-1],
-      },
-      {
-        gate: "NOT",
-        input: [0],
-      },
-    ],
-  };
-  const unusedGates = {
-    output: [2],
-    inputs: 2,
-    gates: [
-      {
-        gate: "AND",
-        input: [-1, -2],
-      },
-      {
-        gate: "OR",
-        input: [-1, -2],
-      },
-      {
-        gate: "NOT",
-        input: [1],
-      },
-    ],
-  };
-  console.time("bake");
-  const gatesAllUsed = cs.bake(unusedGates);
-  console.assert(gatesAllUsed.gates.length === 2, "The unused AND gate is not eliminated.");
-  console.assert(
-    testUtils.deepArrEq(cs.toTruthTable(unusedGates), cs.toTruthTable(gatesAllUsed)),
-    "The optimized output does not function the same as it did unoptimized.",
-  );
-
-  const output = cs.bake(doubleNotGate);
-  console.assert(output.gates.length === 0, "Double NOT gates get removed.");
-  console.assert(
-    testUtils.deepArrEq(cs.toTruthTable(doubleNotGate), cs.toTruthTable(output)),
-    "The optimized output does not function the same as it did unoptimized",
-  );
-  console.timeEnd("bake");
-}
-
 function runSuite() {
   test_run();
   test_toTruthTable();
   test_buildDemultiplexer();
   test_fromTruthTable();
-  test_bake();
 }
 
 export default Object.freeze({

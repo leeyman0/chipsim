@@ -1,4 +1,5 @@
 import ttUtils from "./ttUtils.js";
+import chipUtils from "./chipUtils.js";
 
 /** runs a chip on inputs to produce outputs.
  * @param {Object} c the chip object
@@ -184,80 +185,6 @@ function fromTruthTable(tt) {
   };
 }
 
-/** returns a chip object with no reference to the original.
- * The new chip can be modified with no modification to the original.
- *
- * @param {object} param0 the chip to clone
- * @param {number} param0.inputs The number of inputs that need to be supplied to the chip each time it gets run.
- * @param {object[]} param0.gates The gates that are contained within the chip.
- * @param {number[]} param0.output the indexes of the output gates.
- */
-function cloneChip({ inputs, gates, output }) {
-  return {
-    inputs,
-    output: [...output],
-    gates: gates.map((o) => {
-      return { ...o };
-    }),
-  };
-}
-
-/** optimizes gate layout of a chip, by eliminating duplicates and equivalent structures.
- *
- * @param {object} chip the chip that gets optimized. It will not be modified.
- * @returns {object} the optimized chip. Will be the same thing as the parameter.
- */
-function bake(chip) {
-  const newChip = cloneChip(chip);
-
-  const traversalMemo = new Array(chip.gates.length).fill(false);
-  // first, eliminate gates that aren't traversed from output.
-  for (const out of newChip.output) {
-    let stack = [out];
-    while (stack.length > 0) {
-      let cIndex = stack.pop();
-      console.log("traversing", cIndex);
-      traversalMemo[cIndex] = true;
-      // This line is a work of art. It loads onto the stack all untraveled proper indices.
-      stack.push(...newChip.gates[cIndex].input.filter((i) => i >= 0 && !traversalMemo[i]));
-    }
-  }
-
-  // get the indices to eliminate
-  let eliminate = traversalMemo.flatMap((p, i) => (p ? [] : [i]));
-  console.log("eliminating", eliminate);
-  // make a translation table from the indices to eliminate
-  // to translate old indices to new ones.
-  let translationTable = new Map();
-
-  let downset = 0;
-  for (let i = 0; i < newChip.gates.length; i++) {
-    if (i === eliminate[0]) {
-      ++downset;
-      eliminate.shift();
-    } else {
-      translationTable.set(i, i - downset);
-    }
-  }
-
-  // change every single reference
-  newChip.gates = newChip.gates.flatMap((g, i) => {
-    if (translationTable.get(i) === undefined) return [];
-    else
-      return [
-        {
-          gate: g.gate,
-          input: g.input.map((ip) => (ip < 0 ? ip : translationTable.get(ip))),
-        },
-      ];
-  });
-
-  // change all the references in the output too.
-  newChip.output = newChip.output.map((ip) => (ip < 0 ? ip : translationTable.get(ip)));
-  // Find tautologous gates
-  return newChip;
-}
-
 /** creates a truth table from a chip model. It does this by running the chip through all the
  * possible inputs.
  * @param {Object} c The chip model to run.
@@ -292,9 +219,7 @@ function toTruthTable(c) {
 
 export default Object.freeze({
   run,
-  bake,
   buildDemultiplexer,
   fromTruthTable,
   toTruthTable,
-  cloneChip,
 });
