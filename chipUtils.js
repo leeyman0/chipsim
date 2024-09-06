@@ -73,6 +73,61 @@ function removeUnusedGates(chip) {
   return chip;
 }
 
+/** Removes all instances of double not from a chip. 
+ * 
+ * @param {*} chip the chip object to remove double not from. 
+ */
+function removeDoubleNot(chip) {
+  // mapping dependencies. 
+  // the gate index to the gate indices that rely on it
+  let indexMap = new Map();
+  chip.gates.forEach((gate, i) => {
+    for (const j in gate.input) {
+      const deps = indexMap.get(j);
+      if (deps) {
+        deps.push(i);
+      } else {
+        indexMap.set([i]);
+      }
+    }
+  });
+
+  // Getting chains of NOT gates, that only are chains.
+  let nots = new Map();
+  chip.gates.forEach((gate, i) => {
+    // What we're _actually_ looking for is singleton not with not on the end
+    if (gate.gate === "NOT") {
+      const successors = indexMap.get(i);
+      const hasOneSuccessor = successors && successors.length === 1;
+      if (hasOneSuccessor && chip.gates[successors[0]].gate === "NOT") {
+        nots.set(i, successors[0]);
+      }
+    }
+  });
+
+  // Transforming things into a usable state
+  let trains = new Map();
+  // All of the cars in the train
+  let covered = new Set();
+  nots.forEach((value, key) => {
+    const keyHasBeenCovered = covered.has(key);
+    const valueHasBeenCovered = covered.has(value);
+    if (!keyHasBeenCovered) { // We are NOT covered, this path has not been traversed.
+      if (!valueHasBeenCovered) {  // We've found a train
+
+      } else { // We have found a missing head
+        let train = trains.get(value); // get the train from the value that HAS been traversed
+        // Check to see if the head is the value. 
+        if (train[0] === value)
+          train.unshift(key); // place the missing head at the neck of the train
+        else // Then we are going to form a coalescing tree.
+          ;
+      }
+    } // Otherwise we do nothing
+  })
+  
+
+}
 /** eliminates unnecessary gates inside the chip, eliminates tautologous and contradictory logic.
  *
  * @param {object} chip The chip that gets cut into
@@ -84,5 +139,5 @@ function optimizeLayout(chip) {
 export default Object.freeze({
   cloneChip,
   optimizeLayout,
-  removeUnusedGates,
+  removeDoubleNot,
 });

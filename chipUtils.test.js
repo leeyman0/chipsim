@@ -33,7 +33,7 @@ function test_removeUnusedGates() {
   console.timeEnd("removeUnusedGates");
 }
 
-function test_optimizeLayout() {
+function test_removeDoubleNot() {
   const doubleNotGate = {
     output: [1],
     inputs: 1,
@@ -50,7 +50,7 @@ function test_optimizeLayout() {
   };
 
   console.time("optimizeLayout");
-  const output = chipUtils.optimizeLayout(chipUtils.cloneChip(doubleNotGate));
+  const output = chipUtils.removeDoubleNot(chipUtils.cloneChip(doubleNotGate));
   console.assert(output.gates.length === 0, "Double NOT gates get removed.");
   console.assert(
     testUtils.deepArrEq(cs.toTruthTable(doubleNotGate), cs.toTruthTable(output)),
@@ -61,7 +61,7 @@ function test_optimizeLayout() {
 
 function runSuite() {
   test_removeUnusedGates();
-  test_optimizeLayout();
+  test_removeDoubleNot();
 }
 
 export default Object.freeze({
