@@ -73,12 +73,12 @@ function removeUnusedGates(chip) {
   return chip;
 }
 
-/** Removes all instances of double not from a chip. 
- * 
- * @param {*} chip the chip object to remove double not from. 
+/** Removes all instances of double not from a chip.
+ *
+ * @param {*} chip the chip object to remove double not from.
  */
 function removeDoubleNot(chip) {
-  // mapping dependencies. 
+  // mapping dependencies.
   // the gate index to the gate indices that rely on it
   let indexMap = new Map();
   chip.gates.forEach((gate, i) => {
@@ -112,21 +112,21 @@ function removeDoubleNot(chip) {
   nots.forEach((value, key) => {
     const keyHasBeenCovered = covered.has(key);
     const valueHasBeenCovered = covered.has(value);
-    if (!keyHasBeenCovered) { // We are NOT covered, this path has not been traversed.
-      if (!valueHasBeenCovered) {  // We've found a train
-
-      } else { // We have found a missing head
+    if (!keyHasBeenCovered) {
+      // We are NOT covered, this path has not been traversed.
+      if (!valueHasBeenCovered) {
+        // We've found a train
+      } else {
+        // We have found a missing head
         let train = trains.get(value); // get the train from the value that HAS been traversed
-        // Check to see if the head is the value. 
+        // Check to see if the head is the value.
         if (train[0] === value)
           train.unshift(key); // place the missing head at the neck of the train
-        else // Then we are going to form a coalescing tree.
-          ;
+          // Then we are going to form a coalescing tree.
+        else;
       }
     } // Otherwise we do nothing
-  })
-  
-
+  });
 }
 /** eliminates unnecessary gates inside the chip, eliminates tautologous and contradictory logic.
  *
