@@ -1,4 +1,4 @@
-import testUtils from "./testUtils.js";
+import testUtils from "../src/testUtils.js";
 
 function testDeepArrEq() {
   const a = [1, 2, 3],

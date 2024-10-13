@@ -1,6 +1,6 @@
-import chipUtils from "./chipUtils.js";
-import testUtils from "./testUtils.js";
-import cs from "./chipsim.js";
+import chipUtils from "../src/chipUtils.js";
+import testUtils from "../src/testUtils.js";
+import cs from "../src/chipsim.js";
 
 function test_removeUnusedGates() {
   const unusedGates = {

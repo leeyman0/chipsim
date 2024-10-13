@@ -1,45 +1,45 @@
-import cs from "./chipsim.js";
-import testUtils from "./testUtils.js";
+import cs from "../src/chipsim.js";
+import testUtils from "../src/testUtils.js";
 
-function test_run() {
-  const xor = {
-    output: [3],
-    inputs: 2,
-    gates: [
-      {
-        gate: "AND",
-        input: [-1, -2],
-      },
-      {
-        gate: "NOT",
-        input: [0],
-      },
-      {
-        gate: "OR",
-        input: [-1, -2],
-      },
-      {
-        gate: "AND",
-        input: [1, 2],
-      },
-    ],
-  };
+const xor = {
+  output: [3],
+  inputs: 2,
+  gates: [
+    {
+      gate: "AND",
+      input: [-1, -2],
+    },
+    {
+      gate: "NOT",
+      input: [0],
+    },
+    {
+      gate: "OR",
+      input: [-1, -2],
+    },
+    {
+      gate: "AND",
+      input: [1, 2],
+    },
+  ],
+};
 
-  let right_shift = {
-    output: [-1, -2, -3, -4, -5, -6, -7, -8],
-    inputs: 9,
-    gates: [],
-  };
+test("cs.run runs an xor chip", () => {
+  expect(cs.run(xor, [0, 0])[0]).toBe(0);
+  expect(cs.run(xor, [1, 0])[0]).toBe(1);
+  expect(cs.run(xor, [0, 1])[0]).toBe(1);
+  expect(cs.run(xor, [1, 1])[0]).toBe(0);
+});
 
-  console.time("run");
-  console.assert(cs.run(xor, [0, 0])[0] === 0, "0 xor 0 !== 0");
-  console.assert(cs.run(xor, [1, 0])[0] === 1, "1 xor 0 !== 1");
-  console.assert(cs.run(xor, [0, 1])[0] === 1, "0 xor 1 !== 1");
-  console.assert(cs.run(xor, [1, 1])[0] === 0, "1 xor 1 !== 0");
+let right_shift = {
+  output: [-1, -2, -3, -4, -5, -6, -7, -8],
+  inputs: 9,
+  gates: [],
+};
 
-  console.assert(testUtils.deepArrEq(cs.run(right_shift, [1, 0, 0, 1, 1, 0, 0, 1, 1]), [1, 0, 0, 1, 1, 0, 0, 1]), "right shift faulty");
-  console.timeEnd("run");
-}
+test("run runs a right shift", () => {
+  expect(testUtils.deepArrEq(cs.run(right_shift, [1, 0, 0, 1, 1, 0, 0, 1, 1]), [1, 0, 0, 1, 1, 0, 0, 1])).toBe(true);
+});
 
 function test_toTruthTable() {
   const xor = {

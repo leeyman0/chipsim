@@ -5,11 +5,12 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "test": "node test.js"
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "author": "STCK",
   "license": "GPL-3.0-or-later",
   "devDependencies": {
+    "jest": "^29.7.0",
     "prettier": "3.3.3"
   }
 }

@@ -1,5 +1,5 @@
-import mu from "./matchUtils.js";
-import tu from "./testUtils.js";
+import mu from "../src/matchUtils.js";
+import tu from "../src/testUtils.js";
 
 // Should match all the gates
 const gateMap = {

@@ -1,5 +1,5 @@
-import ttUtils from "./ttUtils.js";
-import testUtils from "./testUtils.js";
+import ttUtils from "../src/ttUtils.js";
+import testUtils from "../src/testUtils.js";
 
 function test_setTT() {
   let input = [
