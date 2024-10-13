@@ -84,16 +84,17 @@ function test_matchGate() {
     }
   });
   console.timeEnd("matchChip gate option");
-
-  console.time("matchChip precededBy option");
+}
+function test_matchGate_precededBy() {
   // test the precededBy options
+  console.time("matchChip precededBy option");
   console.assert(tu.deepArrEq([2, 3, 6], mu.matchChip(gateMap, { gate: "OR", precededBy: "*" })), "matchChip OR precededBy * is faulty");
   console.assert(tu.deepArrEq([6], mu.matchChip(gateMap, { gate: "OR", precededBy: "OR" })), "matchChip OR precededBy OR is faulty");
   console.assert(tu.deepArrEq([2, 6], mu.matchChip(gateMap, { gate: "OR", precededBy: "AND" })), "matchChip OR precededBy AND is faulty");
   console.timeEnd("matchChip precededBy option");
 
-  console.time("matchChip precededByN option");
   // test the precededByN options
+  console.time("matchChip precededByN option");
   console.assert(tu.deepArrEq(mu.matchChip(gateMap, { gate: "NOT" }), mu.matchChip(gateMap, { precededByN: 1 })), "matchChip precededByN is faulty");
   console.timeEnd("matchChip precededByN option");
 }
@@ -112,8 +113,53 @@ function test_matchGate_followedBy() {
   console.timeEnd("matchChip followedByN option");
 }
 
+function test_matchGate_capture() {
+  console.time("matchGate capture and collection");
+  // Specification capture. If capture is not defined, it will return an array of root gate indices.
+  // If it is defined, then a match object takes the place of the indices of the roots. It will have much more information like:
+  // - the indices of the preceding gates. Or the gate in the query.
+  // - the indices of following gates. Or the gate in the query.
+  // - the indices of the gates after the following gates if the match requires the following gate.
+  // - the indices of the gates leading into the gate leading into the root gate if the match requires the previous gate to the root.
+
+  console.log(
+    mu.matchChip(gateMap, {
+      gate: "OR",
+      precededBy: "NOT",
+      capture: {
+        rootIndex: true,
+        precedingIndex: true,
+      },
+    }),
+  );
+
+  console.log(
+    mu.matchChip(gateMap, {
+      gate: "NOT",
+      followedByN: 1,
+      followedBy: "NOT",
+      capture: {
+        afterFollowingIndex: true,
+        precedingIndex: true,
+      },
+      flags: {
+        exclusive: true,
+      },
+    }),
+  );
+
+  console.timeEnd("matchGate capture and collection");
+}
+
+function test_matchGate_flags() {
+  console.time("matchGate flag exclusive");
+  // This flag being set means that all captures are exclusive of each other.
+  console.timeEnd("matchGate flag exclusive");
+}
+
 function runSuite() {
   test_matchGate();
+  test_matchGate_precededBy();
   test_matchGate_followedBy();
 }
 
