@@ -139,5 +139,6 @@ function optimizeLayout(chip) {
 export default Object.freeze({
   cloneChip,
   optimizeLayout,
+  removeUnusedGates,
   removeDoubleNot,
 });

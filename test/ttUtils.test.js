@@ -1,88 +1,81 @@
 import ttUtils from "../src/ttUtils.js";
 import testUtils from "../src/testUtils.js";
 
-function test_setTT() {
-  let input = [
-    [[0], [0]],
-    [[0], [0]],
-  ];
-
-  let expected_result = [
-    [[1], [1]],
-    [[1], [1]],
-  ];
-
-  console.time("setTT");
+let input = [
+  [[0], [0]],
+  [[0], [0]],
+];
+let expected_result = [
+  [[1], [1]],
+  [[1], [1]],
+];
+test("setTT sets inside a truth table object", () => {
   for (let i = 0; i < 2; i++)
     for (let j = 0; j < 2; j++) {
       ttUtils.setTT(input, [i, j], [1]);
     }
-  console.assert(testUtils.deepArrEq(input, expected_result), "setTT doesn't work");
-  console.timeEnd("setTT");
-}
+  expect(testUtils.deepArrEq(input, expected_result)).toBeTruthy();
+});
 
-function test_getTT() {
-  const tt = [
+const tt = [
+  [
     [
       [
-        [
-          [1, 2],
-          [3, 4],
-        ],
-        [
-          [5, 6],
-          [7, 8],
-        ],
+        [1, 2],
+        [3, 4],
       ],
       [
-        [
-          [9, 10],
-          [11, 12],
-        ],
-        [
-          [13, 14],
-          [15, 16],
-        ],
+        [5, 6],
+        [7, 8],
       ],
     ],
     [
       [
-        [
-          [17, 18],
-          [19, 20],
-        ],
-        [
-          [21, 22],
-          [23, 24],
-        ],
+        [9, 10],
+        [11, 12],
       ],
       [
-        [
-          [25, 26],
-          [27, 28],
-        ],
-        [
-          [29, 30],
-          [31, 32],
-        ],
+        [13, 14],
+        [15, 16],
       ],
     ],
-  ];
+  ],
+  [
+    [
+      [
+        [17, 18],
+        [19, 20],
+      ],
+      [
+        [21, 22],
+        [23, 24],
+      ],
+    ],
+    [
+      [
+        [25, 26],
+        [27, 28],
+      ],
+      [
+        [29, 30],
+        [31, 32],
+      ],
+    ],
+  ],
+];
 
-  console.time("getTT");
+test("getTT retrieves a single value from a truth table given list of input values", () => {
   for (let i = 1; i <= 16; i++) {
     // console.log([...(i - 1).toString(2).padStart(4, '0')].map((n) => parseInt(n, 2)))
-    console.assert(
+    expect(
       i * 2 - 1 ===
         ttUtils.getTT(
           tt,
           [...(i - 1).toString(2).padStart(4, "0")].map((n) => parseInt(n, 2)),
         )[0],
-      `getTT failed on ${i}`,
-    );
+    ).toBeTruthy();
   }
-  console.timeEnd("getTT");
-}
+});
 
 function test_getDimensions() {
   let tt = [
@@ -108,7 +101,7 @@ function test_getDimensions() {
     ],
   ];
   console.time("getDimensions");
-  console.assert(testUtils.deepArrEq(ttUtils.getDimensions(tt), [3, 4]), "");
+  expect(testUtils.deepArrEq(ttUtils.getDimensions(tt), [3, 4])).toBeTruthy();
   console.timeEnd("getDimensions");
 }
 
