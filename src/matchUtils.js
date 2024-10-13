@@ -4,7 +4,8 @@
  *
  * @returns {(object, number) => object[]}
  */
-function buildCaptureFunction(chip, followedByIndices, options, flags, captures) {
+function buildCaptureFunction(chip, [followedBySpecified, followedByIndices], options, flags, captures) {
+  let { gate = "*", precededBy = "*", precededByN = "*", followedBy = "*", followedByN = "*" } = options;
   let { rootIndex = true, precedingIndex = false, followingIndex = false, beforePrecedingIndex = false, afterFollowingIndex = false } = captures;
   let { exclusive = false } = flags;
 
@@ -45,46 +46,49 @@ function buildCaptureFunction(chip, followedByIndices, options, flags, captures)
 /** finds indexes of gates that match a pattern
  *
  * @param {object} chip the chip object to match upon
- * @param {object} param1 pattern options. we specify which arguments match
- * @param {string} [param1.gate="*"] The gate to match. Can be "AND", "OR", "NOT", or "*" to match all gates. By default it matches all gates.
- * @param {string} [param1.precededBy="*"] Checks to see the gate of what the current gate is preceded by. By default it doesn't check for anything.
- * @param {string | number} [param1.precededByN="*"] Checks to see how many gates precede the current one. By default it accepts all numbers of gates.
- * @param {string} [param1.followedBy="*"] Checks to see the gate of what the current gate is followed by. By default it doesn't check for anything.
- * @param {string | number} [param1.followedByN="*"] Checks to see how many gates follow the current one. By default it accepts all numbers of gates.
- * @param {object} [param1.capture] Specifies a format to put matches into. If this is left blank then this function will return the indexes of
+ * @param {object} options pattern options. we specify which arguments match
+ * @param {string} [options.gate="*"] The gate to match. Can be "AND", "OR", "NOT", or "*" to match all gates. By default it matches all gates.
+ * @param {string} [options.precededBy="*"] Checks to see the gate of what the current gate is preceded by. By default it doesn't check for anything.
+ * @param {string | number} [options.precededByN="*"] Checks to see how many gates precede the current one. By default it accepts all numbers of gates.
+ * @param {string} [options.followedBy="*"] Checks to see the gate of what the current gate is followed by. By default it doesn't check for anything.
+ * @param {string | number} [options.followedByN="*"] Checks to see how many gates follow the current one. By default it accepts all numbers of gates.
+ * @param {object} [options.capture] Specifies a format to put matches into. If this is left blank then this function will return the indexes of
  * the root.
- * @param {boolean} [param1.capture.rootIndex=true] Captures the root index, the one specified by the pattern gate option. If all of the other options are
+ * @param {boolean} [options.capture.rootIndex=true] Captures the root index, the one specified by the pattern gate option. If all of the other options are
  * not defined
- * @param {boolean} [param1.capture.precedingIndex=false] Captures the preceding indices if the `preceded%` options aren't defined. If some are defined,
+ * @param {boolean} [options.capture.precedingIndex=false] Captures the preceding indices if the `preceded%` options aren't defined. If some are defined,
  * it captures the matching index or indices.
- * @param {boolean} [param1.capture.followingIndex=false] Captures the following indices if the `followed%` options aren't defined. If some are define
- * @param {boolean} [param1.capture.afterFollowingIndex=false] Captures the indices following the following indices, but only if some
- * @param {boolean} [param1.capture.beforePrecedingIndex=false]
- * @param {object} [param1.flags] Extra options that modify the rules that the patterns follow
- * @param {boolean} [param1.flags.exclusive=false] If this is true and a pattern
+ * @param {boolean} [options.capture.followingIndex=false] Captures the following indices if the `followed%` options aren't defined. If some are define
+ * @param {boolean} [options.capture.afterFollowingIndex=false] Captures the indices following the following indices, but only if some
+ * @param {boolean} [options.capture.beforePrecedingIndex=false]
+ * @param {object} [options.flags] Extra options that modify the rules that the patterns follow
+ * @param {boolean} [options.flags.exclusive=false] If this is true and a pattern
  *
  * @returns {Array} The matches. They can be either
  */
 function matchChip(
   chip,
-  {
-    gate = "*",
-    precededBy = "*",
-    precededByN = "*",
-    followedBy = "*",
-    followedByN = "*",
-    capture = {
+  options = {
+    gate: "*",
+    precededBy: "*",
+    precededByN: "*",
+    followedBy: "*",
+    followedByN: "*",
+    capture: {
       rootIndex: true,
       precedingIndex: false,
       followingIndex: false,
       beforePrecedingIndex: false,
       afterFollowingIndex: false,
     },
-    flags = {
+    flags: {
       exclusive: false,
     },
   },
 ) {
+  // Useful for doing verification
+  let { gate = "*", precededBy = "*", precededByN = "*", followedBy = "*", followedByN = "*", flags = {}, capture = {} } = options;
+
   let matches = [];
 
   // Checking if the chip is a valid argument
@@ -125,7 +129,7 @@ function matchChip(
   }
 
   // This loop gathers all of the matches.
-  return chip.gates.flatMap(buildCaptureFunction(chip, followedByIndices, options, flags, capture));
+  return chip.gates.flatMap(buildCaptureFunction(chip, [followedBySpecified, followedByIndices], options, flags, capture));
 }
 
 export default Object.freeze({ matchChip });
