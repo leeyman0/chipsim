@@ -1,5 +1,4 @@
 import mu from "../src/matchUtils.js";
-import tu from "../src/testUtils.js";
 
 // Should match all the gates
 const gateMap = {
@@ -86,7 +85,7 @@ test("matchChip precededBy option match the gates that are preceded by the speci
 });
 
 test("matchChip precededByN option matches the correct number of gates", () => {
-  expect(tu.deepArrEq(mu.matchChip(gateMap, { gate: "NOT" }), mu.matchChip(gateMap, { precededByN: 1 }))).toBeTruthy();
+  expect(mu.matchChip(gateMap, { gate: "NOT" })).toEqual(mu.matchChip(gateMap, { precededByN: 1 }));
 });
 
 test("matchChip followedBy option matches the gates that are followed by the specified gate", () => {
@@ -102,6 +101,12 @@ test("matchChip followedByN option matches the gates that are preceded by the sp
   expect(mu.matchChip(gateMap, { gate: "NOT", followedByN: 0 })).toEqual([]);
 });
 
+// Specification capture. If capture is not defined, it will return an array of root gate indices.
+// If it is defined, then a match object takes the place of the indices of the roots. It will have much more information like:
+// - the indices of the preceding gates. Or the gate in the query.
+// - the indices of following gates. Or the gate in the query.
+// - the indices of the gates after the following gates if the match requires the following gate.
+// - the indices of the gates leading into the gate leading into the root gate if the match requires the previous gate to the root.
 test("matchChip capture.precedingIndex set to true captures the index that the root index is preceded by for each match", () => {
   expect(mu.matchChip(gateMap, { gate: "OR", precededBy: "AND", capture: { precedingIndex: true, rootIndex: false } })).toEqual([
     { precedingIndex: [1] },
@@ -115,44 +120,6 @@ test("matchChip capture.beforePrecedingIndex set to true captures the indices th
     { precedingIndex: [4], beforePrecedingIndex: [2, 3] },
   ]);
 });
-
-// function test_matchGate_capture() {
-//   console.time("matchGate capture and collection");
-//   // Specification capture. If capture is not defined, it will return an array of root gate indices.
-//   // If it is defined, then a match object takes the place of the indices of the roots. It will have much more information like:
-//   // - the indices of the preceding gates. Or the gate in the query.
-//   // - the indices of following gates. Or the gate in the query.
-//   // - the indices of the gates after the following gates if the match requires the following gate.
-//   // - the indices of the gates leading into the gate leading into the root gate if the match requires the previous gate to the root.
-
-//   console.log(
-//     mu.matchChip(gateMap, {
-//       gate: "OR",
-//       precededBy: "NOT",
-//       capture: {
-//         rootIndex: true,
-//         precedingIndex: true,
-//       },
-//     }),
-//   );
-
-//   console.log(
-//     mu.matchChip(gateMap, {
-//       gate: "NOT",
-//       followedByN: 1,
-//       followedBy: "NOT",
-//       capture: {
-//         afterFollowingIndex: true,
-//         precedingIndex: true,
-//       },
-//       flags: {
-//         exclusive: true,
-//       },
-//     }),
-//   );
-
-//   console.timeEnd("matchGate capture and collection");
-// }
 
 // function test_matchGate_flags() {
 //   console.time("matchGate flag exclusive");
