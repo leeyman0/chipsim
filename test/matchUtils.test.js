@@ -102,6 +102,27 @@ test("matchChip followedByN option matches the gates that are preceded by the sp
   expect(tu.deepArrEq([], mu.matchChip(gateMap, { gate: "NOT", followedByN: 0 }))).toBeTruthy();
 });
 
+test("matchChip capture.precedingIndex set to true captures the index that the root index is preceded by for each match", () => {
+  expect(
+    tu.deepArrObjEq(
+      [{ precedingIndex: [1] }, { precedingIndex: [4] }],
+      mu.matchChip(gateMap, { gate: "OR", precededBy: "AND", capture: { precedingIndex: true, rootIndex: false } }),
+    ),
+  ).toBeTruthy();
+});
+
+test("matchChip capture.beforePrecedingIndex set to true captures the indices that feed into the preceding index", () => {
+  expect(
+    tu.deepArrObjEq(
+      [
+        { precedingIndex: [1], beforePrecedingIndex: [-2, -1] },
+        { precedingIndex: [4], beforePrecedingIndex: [2, 3] },
+      ],
+      mu.matchChip(gateMap, { gate: "OR", precededBy: "AND", capture: { precedingIndex: true, rootIndex: false, beforePrecedingIndex: true } }),
+    ),
+  );
+});
+
 // function test_matchGate_capture() {
 //   console.time("matchGate capture and collection");
 //   // Specification capture. If capture is not defined, it will return an array of root gate indices.

@@ -41,6 +41,48 @@ function buildCaptureFunction(chip, [followedBySpecified, followedByIndices], op
         exclusivityArray[i] = true;
       }
     }
+
+    // This is a naïve implementation. It is mostly the same as the other one, but collects everything that's part of the match in
+    // an array.
+    return (current_gate, i) => {
+      // This is where we are collecting the match
+      let match = {};
+      // Doing the easiest part.
+      const gateMatches = gate === "*" || current_gate.gate === gate;
+      // if rootIndex is part of the capture, then make it part of the match
+      if (rootIndex && gateMatches) match.rootIndex = i;
+
+      // collecting the preceding indices.
+      const precedingCollect = [];
+      const precededByMatches =
+        gateMatches &&
+        (precededBy === "*" ||
+          current_gate.input.reduce((acc, gi) => {
+            if (gi < 0 || chip.gates[gi].gate !== precededBy) return acc || false;
+            else {
+              precedingCollect.push(gi);
+              return true;
+            }
+          }, false));
+      // console.log(precedingCollect);
+      if (precededByMatches) {
+        if (precedingIndex) match.precedingIndex = precedingCollect;
+        if (beforePrecedingIndex) {
+          match.beforePrecedingIndex = precedingCollect
+            .filter((index) => index >= 0) // can't access indices less than 0, so filter them out
+            .flatMap((index) => chip.gates[index].input) // getting the inputs to the preceding collect
+            .sort((a, b) => a - b) // sorting to prepare for removal of duplicates
+            .reduce((arr, n) => {
+              // removing duplicates
+              if (arr[arr.length - 1] !== n) arr.push(n);
+              return arr;
+            }, []);
+          // console.log("beforePrecedingIndex:", match.beforePrecedingIndex);
+        }
+      }
+
+      return precededByMatches ? [match] : [];
+    };
   }
 }
 /** finds indexes of gates that match a pattern
