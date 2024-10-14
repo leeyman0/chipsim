@@ -50,13 +50,13 @@ const gateMap = {
 };
 test("matchChip doesn't accept bad chips", () => {
   console.info("Testing on no chip. ↓ There should be an error notification below that the chip argument is not a chip.");
-  expect(tu.deepArrEq(mu.matchChip(null, "doesn't matter"), [])).toBeTruthy();
+  expect(mu.matchChip(null, "doesn't matter")).toEqual([]);
 });
 
 test("matchChip doesn't accept a bad precededByN", () => {
   console.info("Testing on bad precededByN argument. ↓ There should be 2 error notifications below that the precededByN option is a bad argument");
-  expect(tu.deepArrEq(mu.matchChip(gateMap, { precededByN: "This is the first" }), [])).toBeTruthy();
-  expect(tu.deepArrEq(mu.matchChip(gateMap, { precededByN: -2 }), [])).toBeTruthy();
+  expect(mu.matchChip(gateMap, { precededByN: "This is the first" })).toEqual([]);
+  expect(mu.matchChip(gateMap, { precededByN: -2 })).toEqual([]);
 });
 
 // Building the set of all gate indices. Helpful for testing.
@@ -70,19 +70,19 @@ test("matchChip gate options match on the correct gates", () => {
   ["NOT", "AND", "OR", "*", undefined].forEach((gateOption) => {
     if (gateOption === undefined || gateOption === "*") {
       // Default and wildcard behavior.
-      expect(tu.deepArrEq(allGatesMatch, mu.matchChip(gateMap, { gate: gateOption }))).toBeTruthy();
+      expect(mu.matchChip(gateMap, { gate: gateOption })).toEqual(allGatesMatch);
     } else {
       // Gate specification behavior.
       let correct = gateMap.gates.flatMap(({ gate }, i) => (gate === gateOption ? [i] : []));
-      expect(tu.deepArrEq(correct, mu.matchChip(gateMap, { gate: gateOption }))).toBeTruthy();
+      expect(mu.matchChip(gateMap, { gate: gateOption })).toEqual(correct);
     }
   });
 });
 
 test("matchChip precededBy option match the gates that are preceded by the specified gate", () => {
-  expect(tu.deepArrEq([2, 3, 6], mu.matchChip(gateMap, { gate: "OR", precededBy: "*" }))).toBeTruthy();
-  expect(tu.deepArrEq([6], mu.matchChip(gateMap, { gate: "OR", precededBy: "OR" }))).toBeTruthy();
-  expect(tu.deepArrEq([2, 6], mu.matchChip(gateMap, { gate: "OR", precededBy: "AND" }))).toBeTruthy();
+  expect(mu.matchChip(gateMap, { gate: "OR", precededBy: "*" })).toEqual([2, 3, 6]);
+  expect(mu.matchChip(gateMap, { gate: "OR", precededBy: "OR" })).toEqual([6]);
+  expect(mu.matchChip(gateMap, { gate: "OR", precededBy: "AND" })).toEqual([2, 6]);
 });
 
 test("matchChip precededByN option matches the correct number of gates", () => {
@@ -90,37 +90,30 @@ test("matchChip precededByN option matches the correct number of gates", () => {
 });
 
 test("matchChip followedBy option matches the gates that are followed by the specified gate", () => {
-  expect(tu.deepArrEq([1, 4, 7], mu.matchChip(gateMap, { gate: "AND", followedBy: "*" }))).toBeTruthy();
-  expect(tu.deepArrEq([1, 4], mu.matchChip(gateMap, { gate: "AND", followedBy: "OR" }))).toBeTruthy();
-  expect(tu.deepArrEq([0], mu.matchChip(gateMap, { gate: "NOT", followedBy: "OR" }))).toBeTruthy();
-  expect(tu.deepArrEq([2, 3, 6], mu.matchChip(gateMap, { gate: "OR", followedBy: "AND" }))).toBeTruthy();
+  expect(mu.matchChip(gateMap, { gate: "AND", followedBy: "*" })).toEqual([1, 4, 7]);
+  expect(mu.matchChip(gateMap, { gate: "AND", followedBy: "OR" })).toEqual([1, 4]);
+  expect(mu.matchChip(gateMap, { gate: "NOT", followedBy: "OR" })).toEqual([0]);
+  expect(mu.matchChip(gateMap, { gate: "OR", followedBy: "AND" })).toEqual([2, 3, 6]);
 });
 
 test("matchChip followedByN option matches the gates that are preceded by the specified number of gates", () => {
-  expect(tu.deepArrEq([], mu.matchChip(gateMap, { gate: "NOT", followedByN: 2 }))).toBeTruthy();
-  expect(tu.deepArrEq([0, 5], mu.matchChip(gateMap, { gate: "NOT", followedByN: 1 }))).toBeTruthy();
-  expect(tu.deepArrEq([], mu.matchChip(gateMap, { gate: "NOT", followedByN: 0 }))).toBeTruthy();
+  expect(mu.matchChip(gateMap, { gate: "NOT", followedByN: 2 })).toEqual([]);
+  expect(mu.matchChip(gateMap, { gate: "NOT", followedByN: 1 })).toEqual([0, 5]);
+  expect(mu.matchChip(gateMap, { gate: "NOT", followedByN: 0 })).toEqual([]);
 });
 
 test("matchChip capture.precedingIndex set to true captures the index that the root index is preceded by for each match", () => {
-  expect(
-    tu.deepArrObjEq(
-      [{ precedingIndex: [1] }, { precedingIndex: [4] }],
-      mu.matchChip(gateMap, { gate: "OR", precededBy: "AND", capture: { precedingIndex: true, rootIndex: false } }),
-    ),
-  ).toBeTruthy();
+  expect(mu.matchChip(gateMap, { gate: "OR", precededBy: "AND", capture: { precedingIndex: true, rootIndex: false } })).toEqual([
+    { precedingIndex: [1] },
+    { precedingIndex: [4] },
+  ]);
 });
 
 test("matchChip capture.beforePrecedingIndex set to true captures the indices that feed into the preceding index", () => {
-  expect(
-    tu.deepArrObjEq(
-      [
-        { precedingIndex: [1], beforePrecedingIndex: [-2, -1] },
-        { precedingIndex: [4], beforePrecedingIndex: [2, 3] },
-      ],
-      mu.matchChip(gateMap, { gate: "OR", precededBy: "AND", capture: { precedingIndex: true, rootIndex: false, beforePrecedingIndex: true } }),
-    ),
-  );
+  expect(mu.matchChip(gateMap, { gate: "OR", precededBy: "AND", capture: { precedingIndex: true, rootIndex: false, beforePrecedingIndex: true } })).toEqual([
+    { precedingIndex: [1], beforePrecedingIndex: [-2, -1] },
+    { precedingIndex: [4], beforePrecedingIndex: [2, 3] },
+  ]);
 });
 
 // function test_matchGate_capture() {
