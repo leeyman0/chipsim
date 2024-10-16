@@ -68,12 +68,11 @@ test("getTT retrieves a single value from a truth table given list of input valu
   for (let i = 1; i <= 16; i++) {
     // console.log([...(i - 1).toString(2).padStart(4, '0')].map((n) => parseInt(n, 2)))
     expect(
-      i * 2 - 1 ===
-        ttUtils.getTT(
-          tt,
-          [...(i - 1).toString(2).padStart(4, "0")].map((n) => parseInt(n, 2)),
-        )[0],
-    ).toBeTruthy();
+      ttUtils.getTT(
+        tt,
+        [...(i - 1).toString(2).padStart(4, "0")].map((n) => parseInt(n, 2)),
+      )[0],
+    ).toEqual(i * 2 - 1);
   }
 });
 

@@ -1,5 +1,4 @@
 import cs from "../src/chipsim.js";
-import testUtils from "../src/testUtils.js";
 
 const xor = {
   output: [3],
@@ -38,7 +37,7 @@ let right_shift = {
 };
 
 test("run runs a right shift", () => {
-  expect(testUtils.deepArrEq(cs.run(right_shift, [1, 0, 0, 1, 1, 0, 0, 1, 1]), [1, 0, 0, 1, 1, 0, 0, 1])).toBeTruthy();
+  expect(cs.run(right_shift, [1, 0, 0, 1, 1, 0, 0, 1, 1])).toEqual([1, 0, 0, 1, 1, 0, 0, 1]);
 });
 
 const tt = [
@@ -47,7 +46,7 @@ const tt = [
 ];
 
 test("toTruthTable correctly generates the xor truth table", () => {
-  expect(testUtils.deepArrEq(tt, cs.toTruthTable(xor))).toBeTruthy();
+  expect(cs.toTruthTable(xor)).toEqual(tt);
 });
 
 test("buildDemultiplexer correctly generates a 4-bit demultiplexer", () => {
@@ -58,7 +57,7 @@ test("buildDemultiplexer correctly generates a 4-bit demultiplexer", () => {
     const expectedOutput = [...new Array(i).fill(0), 1, ...new Array(15 - i).fill(0)];
     // As the model change, so does the performance of this.
     const actualOutput = cs.run(demux4, ip);
-    expect(testUtils.deepArrEq(actualOutput, expectedOutput)).toBeTruthy();
+    expect(actualOutput).toEqual(expectedOutput);
   }
 });
 const tt_2 = [
@@ -110,6 +109,6 @@ const tt_2 = [
 
 test("fromTruthTable generates the same truth table as the original", () => {
   const compiledOutput = cs.fromTruthTable(tt);
-  expect(testUtils.deepArrEq(tt, cs.toTruthTable(compiledOutput))).toBeTruthy();
-  expect(testUtils.deepArrEq(tt_2, cs.toTruthTable(cs.fromTruthTable(tt_2)))).toBeTruthy();
+  expect(cs.toTruthTable(compiledOutput)).toEqual(tt);
+  expect(cs.toTruthTable(cs.fromTruthTable(tt_2))).toEqual(tt_2);
 });

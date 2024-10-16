@@ -1,5 +1,4 @@
 import chipUtils from "../src/chipUtils.js";
-import testUtils from "../src/testUtils.js";
 import cs from "../src/chipsim.js";
 const unusedGates = {
   output: [2],
@@ -22,8 +21,8 @@ const unusedGates = {
 
 test("removeUnusedGates tracks and removes gates without affecting the proper functioning of a chip", () => {
   const gatesAllUsed = chipUtils.removeUnusedGates(chipUtils.cloneChip(unusedGates));
-  expect(gatesAllUsed.gates.length === 2).toBeTruthy();
-  expect(testUtils.deepArrEq(cs.toTruthTable(unusedGates), cs.toTruthTable(gatesAllUsed))).toBeTruthy();
+  expect(gatesAllUsed.gates.length).toEqual(2);
+  expect(cs.toTruthTable(unusedGates)).toEqual(cs.toTruthTable(gatesAllUsed));
 });
 
 // function test_removeDoubleNot() {
